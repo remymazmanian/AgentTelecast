@@ -1,0 +1,77 @@
+{
+  "title": "AgentTelecast",
+  "subtitle": "Demo data",
+  "timeZone": "America/Los_Angeles",
+  "timeZoneLabel": "PT",
+  "summary": "Demo data. Six agents handled 150 events over the last five days. 12 things are waiting for you.",
+  "sources": ["Demo dataset (fictional)"],
+  "metrics": [
+    { "value": "12", "label": "Waiting on you", "detail": "Oldest from Thursday", "tone": "warning" },
+    { "value": "5", "label": "Blockers", "detail": "2 need you", "tone": "danger" },
+    { "value": "6", "label": "Agents active since 6 AM Mar 2", "detail": "All 6 checked in today" }
+  ],
+  "sections": [
+    {
+      "heading": "Waiting for you",
+      "caption": "Things an agent asked you and is still waiting on, newest first.",
+      "items": [
+        {
+          "title": "Inbox",
+          "lead": "Mon 9:42 AM",
+          "body": "Approve the reply to the venue about the March 14 booking. Draft is ready.",
+          "status": null,
+          "fields": [["When", "Mon 9:42 AM"]]
+        }
+      ]
+    },
+    {
+      "heading": "Blockers",
+      "caption": "Work that can't move until something is fixed.",
+      "notes": [{ "tone": "info", "lead": "Tip:", "text": "Most blockers clear once you re-approve an expired login." }],
+      "items": [
+        {
+          "title": "Social",
+          "lead": "Since Sun",
+          "body": "Scheduler token expired; posts are queued but not publishing.",
+          "status": { "label": "Needs you", "tone": "warning" }
+        }
+      ]
+    },
+    {
+      "heading": "Scheduled jobs",
+      "caption": "Routines your agents run on a schedule.",
+      "items": [
+        {
+          "title": "Morning inbox triage",
+          "lead": "Mon 7:00 AM",
+          "body": "Daily 7:00 AM",
+          "when": "Tue 7:00 AM",
+          "whenLabel": "Next run",
+          "status": { "label": "Enabled", "tone": "success" },
+          "fields": [["Schedule", "Daily 7:00 AM"], ["Last run", "Mon 7:00 AM"]]
+        }
+      ]
+    },
+    {
+      "heading": "Timeline",
+      "caption": "Everything the agents did, newest first.",
+      "filters": ["Agent"],
+      "views": [
+        {
+          "label": "All",
+          "items": [
+            { "title": "Home", "lead": "Mon Mar 2 · 10:25 PM", "body": "Garage camera went offline" },
+            { "title": "Inbox", "lead": "Mon Mar 2 · 9:42 AM", "body": "Drafted the venue reply" }
+          ]
+        },
+        {
+          "label": "Mon Mar 2",
+          "items": [
+            { "title": "Home", "lead": "Mon Mar 2 · 10:25 PM", "body": "Garage camera went offline" }
+          ]
+        }
+      ]
+    }
+  ],
+  "meta": { "updatedAt": "2026-03-02T18:05:00.000Z" }
+}

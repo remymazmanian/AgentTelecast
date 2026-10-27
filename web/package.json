@@ -1,0 +1,15 @@
+{
+  "name": "agenttelecast",
+  "version": "1.0.0",
+  "description": "An open-source dashboard for your SI agents, built for the TV remote. It runs in any browser too.",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs demo/demo-data.json dist/index.html",
+    "demo": "node demo/build-demo.cjs",
+    "shots": "node demo/build-demo.cjs && node demo/shoot.cjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

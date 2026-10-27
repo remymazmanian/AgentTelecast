@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/agenttelecast/agenttelecast-feed.schema.json",
+  "title": "AgentTelecast feed",
+  "description": "The JSON document AgentTelecast renders. Only \"sections\" is required. Unknown fields are ignored. See docs/DATA-FORMAT.md.",
+  "type": "object",
+  "required": [
+    "sections"
+  ],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Board name. Informational; the page header always says AgentTelecast."
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Small line under the AgentTelecast name in the sidebar."
+    },
+    "timeZone": {
+      "type": "string",
+      "description": "IANA time zone for the clock and the data-as-of time, e.g. America/New_York. Default: the viewer's zone."
+    },
+    "timeZoneLabel": {
+      "type": "string",
+      "description": "Short label shown after times, e.g. ET. Default: derived from timeZone. Use \"\" to hide."
+    },
+    "scheduledDetail": {
+      "type": "string",
+      "description": "Caption on the Scheduled jobs KPI tile. Default: Agent routines."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Paragraph shown on the Overview Summary card."
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Where the data came from; shown in the Summary details."
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Headline numbers. Metrics whose label matches waiting, blocker, agents active, or bots active become KPI tiles. bots active is still recognized so older feeds keep the tile.",
+      "items": {
+        "type": "object",
+        "required": [
+          "value",
+          "label"
+        ],
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "tone": {
+            "$ref": "#/$defs/tone"
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "description": "One entry per sidebar section, in any order (they are sorted by the heading rules or \"order\").",
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "updatedAt": {
+          "type": "string",
+          "description": "When the data was produced, as an ISO 8601 date-time (e.g. 2026-03-02T18:05:00Z). Shown as Data as of."
+        },
+        "sourceSha256": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "tone": {
+      "enum": [
+        "accent",
+        "success",
+        "warning",
+        "danger",
+        "neutral"
+      ]
+    },
+    "status": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "label"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "tone": {
+              "$ref": "#/$defs/tone"
+            }
+          }
+        }
+      ]
+    },
+    "item": {
+      "type": "object",
+      "description": "One card (or one row in long lists).",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Card title, usually the agent or project name."
+        },
+        "lead": {
+          "type": "string",
+          "description": "Small line under the title, e.g. a time or a short context."
+        },
+        "body": {
+          "type": "string",
+          "description": "Main text."
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "fields": {
+          "type": "array",
+          "description": "Extra key/value pairs shown in the details drawer.",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "description": "[key, value]"
+          }
+        },
+        "when": {
+          "type": "string",
+          "description": "Time text with a clock icon."
+        },
+        "whenLabel": {
+          "type": "string",
+          "description": "Label for \"when\" in the details drawer, e.g. Next run."
+        },
+        "sub": {
+          "type": "string",
+          "description": "Secondary line under the body."
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": [
+        "heading"
+      ],
+      "properties": {
+        "heading": {
+          "type": "string",
+          "description": "Section name. The part before the first comma is the sidebar label."
+        },
+        "caption": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tone": {
+                "type": "string"
+              },
+              "lead": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "text": {
+          "type": "string",
+          "description": "Free text, shown when the section has no items."
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/item"
+          }
+        },
+        "cols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Original column names, informational."
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "First entry adds a filter chip that filters items by title."
+        },
+        "views": {
+          "type": "array",
+          "description": "Tabs inside the section, e.g. one per day. The first view is the default.",
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "items"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "count": {
+                "type": "number"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/item"
+                }
+              }
+            }
+          }
+        },
+        "parent": {
+          "type": "string",
+          "description": "Optional grouping name, informational."
+        },
+        "icon": {
+          "enum": [
+            "x",
+            "left",
+            "right",
+            "bot",
+            "grid",
+            "hourglass",
+            "alert",
+            "activity",
+            "check",
+            "clock",
+            "calendar",
+            "branch",
+            "cpu",
+            "repeat",
+            "archive",
+            "moon",
+            "users",
+            "list",
+            "filter",
+            "info",
+            "pulse",
+            "dot"
+          ],
+          "description": "Overrides the icon picked from the heading."
+        },
+        "tone": {
+          "$ref": "#/$defs/tone",
+          "description": "Overrides the color picked from the heading."
+        },
+        "order": {
+          "type": "number",
+          "description": "Sort position (lower first). Overrides the order picked from the heading."
+        }
+      }
+    }
+  }
+}

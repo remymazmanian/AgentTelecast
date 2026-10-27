@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 — first public release
+## 1.0.0 — Initial public release
 
 - Web page: one self-contained HTML file with a TV layout (1920×1080, remote-friendly) and a
   browser layout for desktop and phone.

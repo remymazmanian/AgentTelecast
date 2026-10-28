@@ -4,6 +4,8 @@ An open-source dashboard for your SI agents, built for the TV remote. It runs in
 
 Take it and make it your own: point it at your agents' data, restyle it, fork it.
 
+Setup guide and FAQ: https://remymazmanian.com/agenttelecast/
+
 ![AgentTelecast on a TV, demo data: KPI tiles, items waiting on you, blockers and running agents](screenshots/tv-overview.png)
 
 AgentTelecast puts what your agents are doing on one screen: what is waiting for you, what is blocked,

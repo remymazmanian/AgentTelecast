@@ -30,7 +30,31 @@ final class Prefs {
         if (u == null || u.trim().isEmpty()) sp(c).edit().remove(K_URL).apply();
         else sp(c).edit().putString(K_URL, u).apply();
     }
-    static int reloadMinutes(Context c) { return sp(c).getInt(K_RELOAD, DEFAULT_RELOAD_MIN); }
+    /** Data refresh choices in minutes, 0 = off. The same list the page offers. */
+    static final int[] REFRESH_CHOICES = { 0, 1, 5, 15, 30, 60 };
+
+    /** How often to look for new data: the saved choice, or the default when none is saved. */
+    static int reloadMinutes(Context c) { int m = savedRefresh(c); return m < 0 ? DEFAULT_RELOAD_MIN : m; }
+    /** The saved refresh choice, or -1 when the user hasn't picked one (the page then uses the feed's setting or 5). */
+    static int savedRefresh(Context c) {
+        SharedPreferences p = sp(c);
+        return p.contains(K_RELOAD) ? snapRefresh(p.getInt(K_RELOAD, DEFAULT_RELOAD_MIN)) : -1;
+    }
+    /** Saves a refresh choice; -1 clears it. Other values snap to the nearest choice. */
+    static void saveRefresh(Context c, int m) {
+        if (m < 0) sp(c).edit().remove(K_RELOAD).apply();
+        else sp(c).edit().putInt(K_RELOAD, snapRefresh(m)).apply();
+    }
+    /** Older versions stored any number of minutes; map it to the closest choice. */
+    static int snapRefresh(int m) {
+        if (m <= 0) return 0;
+        int best = REFRESH_CHOICES[1];
+        for (int v : REFRESH_CHOICES) if (v > 0 && Math.abs(v - m) < Math.abs(best - m)) best = v;
+        return best;
+    }
+    static String refreshLabel(int m) {
+        return m == 0 ? "Off" : m == 60 ? "1 hour" : m + " min";
+    }
     static int textZoom(Context c) { return sp(c).getInt(K_ZOOM, DEFAULT_TEXT_ZOOM); }
 
     /** Adds http:// when no scheme is given. Returns "" for blank input. */

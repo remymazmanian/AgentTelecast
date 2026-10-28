@@ -43,6 +43,8 @@ Unknown fields are ignored, so you can keep your own bookkeeping in the same fil
 | `scheduledDetail` | string | Caption on the "Scheduled jobs" tile. Default `Agent routines`. |
 | `title` | string | Informational. |
 | `meta.updatedAt` | string (ISO 8601 date-time) | When the data was produced. Shown as "Data as of". |
+| `meta.refreshMinutes` | number: `0`, `1`, `5`, `15`, `30` or `60` | Suggested interval for looking for new data. `0` = off. Used only until the viewer picks their own. Other values are ignored. Default `5`. |
+| `meta.updateNote` | string | Optional line under the refresh line in the footer, e.g. `Updated hourly, 9 AM–6 PM`. Use it to say how often the feed itself changes. Up to 120 characters. `meta.nextUpdate` is accepted as another name. |
 
 ## Metric
 
@@ -126,7 +128,8 @@ Use one of these:
 
 - **At build time:** `node build.cjs path/to/feed.json dist/index.html` bakes the data into one HTML file.
 - **Fetched at runtime:** `node build.cjs --feed https://example.com/agenttelecast.json` builds a page that loads
-  that URL every time it opens and looks there for new data every 5 minutes. The baked data is the fallback.
+  that URL every time it opens and looks there for new data on the viewer's schedule (see below). The baked data
+  is the fallback.
 - **In a browser, without rebuilding:** open the page with `?data=<url>`, for example
   `index.html?data=https://example.com/agenttelecast.json`. That address is used for this visit only, unless you
   confirm **Save this data source?**. `?data=demo` shows the bundled demo for this visit, and does not clear a
@@ -137,6 +140,23 @@ When the page fetches a feed from a different site, that server has to allow cro
 (send `Access-Control-Allow-Origin`). Serving the page and the feed from the same place avoids that.
 
 If a feed can't be loaded or isn't valid, the page shows the baked data and a short notice at the bottom.
+
+## How often the page looks for new data
+
+The viewer decides. The footer line ("Looks for new data every 5 min") is a button: select it with the
+remote or click it, and pick Off, every minute, 5, 15 or 30 minutes, or every hour. The footer always
+shows the current choice, and "Auto-refresh off" when it's off.
+
+The interval comes from, in order:
+
+1. The viewer's saved choice. In a browser it's saved in that browser. In the Android app it's saved
+   in the app and also shown in its Settings and setup screen. Opening the page with `?refresh=`
+   sets and saves it too: `off`, `0`, `1`, `5`, `15`, `30` or `60`, for example `index.html?refresh=15`.
+2. `meta.refreshMinutes` from the feed.
+3. 5 minutes.
+
+The page only reloads when the data has actually changed, and waits while a details panel is open.
+If your feed changes less often than the page checks, say so with `meta.updateNote`.
 
 ## Checking a feed
 

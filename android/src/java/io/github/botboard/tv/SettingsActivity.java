@@ -17,7 +17,8 @@ import android.widget.Toast;
 
 /** Plain, remote-friendly settings screen. Values are stored in SharedPreferences. */
 public class SettingsActivity extends Activity {
-    private EditText url, reload, zoom;
+    private EditText url, zoom;
+    private RefreshPicker refresh;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -31,9 +32,9 @@ public class SettingsActivity extends Activity {
         col.addView(text("Dashboard URL", 20));
         url = edit(Prefs.url(this), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
         col.addView(url);
-        col.addView(text("Auto-reload every N minutes (0 = off)", 20));
-        reload = edit(String.valueOf(Prefs.reloadMinutes(this)), InputType.TYPE_CLASS_NUMBER);
-        col.addView(reload);
+        col.addView(text("Look for new data every", 20));
+        refresh = new RefreshPicker(this, Prefs.savedRefresh(this), null, 20);
+        col.addView(refresh.row);
         col.addView(text("Text zoom % (100 = normal)", 20));
         zoom = edit(String.valueOf(Prefs.textZoom(this)), InputType.TYPE_CLASS_NUMBER);
         col.addView(zoom);
@@ -51,7 +52,7 @@ public class SettingsActivity extends Activity {
         } }));
         row.addView(button("Reset to default", new View.OnClickListener() { public void onClick(View v) {
             url.setText(Flavor.LEGACY_URL);
-            reload.setText(String.valueOf(Prefs.DEFAULT_RELOAD_MIN));
+            refresh.select(-1);
             zoom.setText(String.valueOf(Prefs.DEFAULT_TEXT_ZOOM));
         } }));
         row.addView(button("Cancel", new View.OnClickListener() { public void onClick(View v) { finish(); } }));
@@ -69,12 +70,9 @@ public class SettingsActivity extends Activity {
         String u = Prefs.normalizeUrl(url.getText().toString());
         String err = u.isEmpty() ? null : Prefs.validate(u);
         if (err != null) { Toast.makeText(this, err, Toast.LENGTH_LONG).show(); url.requestFocus(); return; }
-        int r = parse(reload.getText().toString(), Prefs.DEFAULT_RELOAD_MIN, 0, 1440);
         int z = parse(zoom.getText().toString(), Prefs.DEFAULT_TEXT_ZOOM, 50, 300);
-        Prefs.sp(this).edit()
-                .putInt(Prefs.K_RELOAD, r)
-                .putInt(Prefs.K_ZOOM, z)
-                .apply();
+        Prefs.sp(this).edit().putInt(Prefs.K_ZOOM, z).apply();
+        Prefs.saveRefresh(this, refresh.selected);
         Prefs.saveUrl(this, u);
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
         finish();

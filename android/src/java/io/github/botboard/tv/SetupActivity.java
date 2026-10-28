@@ -37,6 +37,7 @@ public class SetupActivity extends Activity {
     private EditText url;
     private TextView status;
     private Button saveBtn;
+    private RefreshPicker refresh;
     private String failedUrl;   // last URL that failed the test; a second Save keeps it anyway
     private int testSeq;
 
@@ -78,6 +79,13 @@ public class SetupActivity extends Activity {
         status = text("", 18, C_TXT2, false);
         status.setMinLines(2);
         col.addView(status);
+
+        col.addView(text("Look for new data every", 17, C_TXT2, false));
+        refresh = new RefreshPicker(this, Prefs.savedRefresh(this), new RefreshPicker.Styler() {
+            public Button make(String label, View.OnClickListener l) { return button(label, false, l); }
+        }, 18);
+        refresh.row.setPadding(0, dp(4), 0, dp(6));
+        col.addView(refresh.row);
 
         LinearLayout actions = row();
         saveBtn = button("Save", true, new View.OnClickListener() { public void onClick(View v) { save(); } });
@@ -192,6 +200,7 @@ public class SetupActivity extends Activity {
 
     private void finishWith(String u) {
         Prefs.saveUrl(this, u);
+        Prefs.saveRefresh(this, refresh.selected);
         setResult(RESULT_OK);
         finish();
     }

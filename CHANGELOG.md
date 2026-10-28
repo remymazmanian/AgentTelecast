@@ -2,9 +2,17 @@
 
 ## Unreleased
 
-- Footer wording: "Checks for updates every 5 min" now reads "Looks for new data every 5 min".
-  The old line made it sound like the board itself updates that often. It only re-checks the
-  data feed, which may change much less often.
+- How often the page looks for new data is now your choice: Off, 1, 5, 15 or 30 minutes, or every
+  hour. Select the footer line with the remote (or click it) to change it. The choice is saved in the
+  browser, or in the app, where Settings and the setup screen offer the same choices. `?refresh=` in
+  the address sets it too.
+- The footer now says what it actually does and follows your choice: "Looks for new data every 15 min",
+  "Looks for new data every hour" or "Auto-refresh off". It used to say "Checks for updates every
+  5 min", which sounded like the data itself changed that often.
+- Feeds can suggest a default with `meta.refreshMinutes`, and add a footer line such as
+  "Updated hourly, 9 AM–6 PM" with `meta.updateNote`.
+- Android: the free-form "Auto-reload every N minutes" box is replaced by the same choices. An older
+  saved number is moved to the closest choice.
 
 ## 1.0.0 — Initial public release
 

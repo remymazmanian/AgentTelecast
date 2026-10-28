@@ -87,6 +87,28 @@
         },
         "sourceSha256": {
           "type": "string"
+        },
+        "refreshMinutes": {
+          "type": "integer",
+          "enum": [
+            0,
+            1,
+            5,
+            15,
+            30,
+            60
+          ],
+          "description": "Suggested minutes between looks for new data (0 = off). Used until the viewer picks their own interval. Default 5."
+        },
+        "updateNote": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Optional footer line saying how often the feed itself changes, e.g. Updated hourly, 9 AM-6 PM."
+        },
+        "nextUpdate": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "Another name for updateNote."
         }
       }
     }

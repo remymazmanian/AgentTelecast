@@ -32,6 +32,8 @@ svg.i{width:28px;height:28px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .date{font-size:19px;color:var(--txt2);margin-top:8px}
 .asof{font-size:16px;color:var(--mut);margin-top:14px;line-height:1.45}
 .asof b{color:var(--txt2);font-weight:500}
+.rf{display:inline-block;margin:0 -8px;padding:0 8px;border:0;border-radius:8px;background:none;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:pointer}
+.rnote{display:block;color:var(--txt2)}
 .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:8px;vertical-align:2px;box-shadow:0 0 0 4px rgba(60,207,142,.14)}
 
 /* Main */
@@ -194,7 +196,7 @@ html.web .empty{font-size:16px}
 /* hover + pointer mode */
 html.web .card:hover,html.web .row:hover,html.web .kpi:hover{border-color:var(--line2);background:var(--panel2)}
 html.web .ni:hover{background:rgba(255,255,255,.06);color:var(--txt)} html.web .chip:hover{border-color:rgba(255,255,255,.3);color:var(--txt)}
-html.web .opt:hover{background:rgba(255,255,255,.06)}
+html.web .opt:hover{background:rgba(255,255,255,.06)} html.web .rf:hover{color:var(--txt2);text-decoration:underline;text-underline-offset:3px}
 html.mouse .f.focus{box-shadow:none;transform:none}
 html.mouse .card.focus,html.mouse .row.focus,html.mouse .kpi.focus{border-color:var(--line)!important;background:var(--panel)}
 html.mouse .chip.focus{border-color:var(--line2)!important} html.mouse .chip.on.focus{border-color:var(--txt)!important}

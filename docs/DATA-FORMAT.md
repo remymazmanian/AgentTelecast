@@ -126,7 +126,7 @@ Use one of these:
 
 - **At build time:** `node build.cjs path/to/feed.json dist/index.html` bakes the data into one HTML file.
 - **Fetched at runtime:** `node build.cjs --feed https://example.com/agenttelecast.json` builds a page that loads
-  that URL every time it opens and checks it again every 5 minutes. The baked data is the fallback.
+  that URL every time it opens and looks there for new data every 5 minutes. The baked data is the fallback.
 - **In a browser, without rebuilding:** open the page with `?data=<url>`, for example
   `index.html?data=https://example.com/agenttelecast.json`. That address is used for this visit only, unless you
   confirm **Save this data source?**. `?data=demo` shows the bundled demo for this visit, and does not clear a

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Footer wording: "Checks for updates every 5 min" now reads "Looks for new data every 5 min".
+  The old line made it sound like the board itself updates that often. It only re-checks the
+  data feed, which may change much less often.
+
 ## 1.0.0 — Initial public release
 
 - Web page: one self-contained HTML file with a TV layout (1920×1080, remote-friendly) and a

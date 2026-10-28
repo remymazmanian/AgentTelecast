@@ -236,8 +236,9 @@
       if (dir === "up" || dir === "down") return scrollDrawer(dir === "down" ? 1 : -1);
       return stepDrawer(dir === "right" ? 1 : -1);
     }
+    if (z === "rf") { if (dir === "up") setFocus(zoneEls("nav").pop()); else if (dir === "right") setFocus(firstMain() || $(".kpi.f")); return; }
     var t2 = nearest(cur, dir, zoneEls(z));
-    if (z === "nav") { if (dir === "right") return setFocus(firstMain() || $(".kpi.f")); if (t2 && dir !== "left") setFocus(t2); return; }
+    if (z === "nav") { if (dir === "right") return setFocus(firstMain() || $(".kpi.f")); if (t2 && dir !== "left") setFocus(t2); else if (!t2 && dir === "down" && zoneEls("rf").length) setFocus(zoneEls("rf")[0]); return; }
     if (t2) return setFocus(t2);
     if (dir === "left") return setFocus(navEl());
     if (z === "main" && dir === "up") return setFocus(nearest(cur, "up", zoneEls("kpi")) || $(".kpi.f"));
@@ -322,6 +323,16 @@
     st.ret = "flt"; st.picker = true; dItem = null; openDrawer(h);
     setFocus($(".opt.cur") || $(".opt"));
   }
+  function openRefresh() {
+    var m = rfMinutes(), saved = rfSaved() != null;
+    var h = '<div class="dh">' + closeBtn() + '<div class="kick">' + icon("repeat") + 'Data refresh</div><div class="dtitle">Look for new data</div>' +
+      '<div class="dmeta"><span>' + (APP ? "Saved in the app. Also in its Settings (press Menu or hold OK)." : "Saved in this browser.") + (saved ? "" : " Now using the " + (rfValid(M.refreshMinutes) != null ? "feed's" : "default") + " setting.") + "</span></div>" +
+      '</div><div class="dbody"><div class="db-in">' + (M.updateNote ? '<div class="note">' + icon("info") + "<div><b>From the data owner:</b> " + esc(M.updateNote) + "</div></div>" : "") + '<div class="opts">';
+    h += RF_OPTS.map(function (o, i) { return '<div class="opt f' + (o === m ? " cur" : "") + '" data-zone="drawer" data-id="r' + i + '" data-val="' + o + '"><span>' + (o === 0 ? "Off" : o === 60 ? "Every hour" : o === 1 ? "Every minute" : "Every " + o + " minutes") + "</span>" + (o === m ? '<span class="c">Current</span>' : "") + "</div>"; }).join("");
+    h += "</div></div></div>" + foot('<span><span class="key">OK</span>Choose</span>');
+    st.ret = "rf"; st.picker = "rf"; dItem = null; openDrawer(h);
+    setFocus($(".opt.cur") || $(".opt"));
+  }
 
   // ---------- actions ----------
   function ok() {
@@ -329,7 +340,9 @@
     var z = cur.getAttribute("data-zone");
     if (z === "nav") return setFocus(firstMain());
     if (z === "kpi") { var t = cur.getAttribute("data-target"); if (t !== "") { var ti = +t; selectSection(ti); var ne = navEl(); $$(".ni").forEach(function (n) { n.classList.toggle("sel", n === ne); }); keepNavVisible(ne); setFocus(firstMain()); } return; }
+    if (z === "drawer" && st.picker === "rf") { rfSave(+cur.getAttribute("data-val")); st.picker = false; applyRefresh(); closeDrawer(); return; }
     if (z === "drawer") { st.filter = cur.getAttribute("data-val"); st.picker = false; renderMain(); closeDrawer(); return; }
+    if (z === "rf") return openRefresh();
     if (cur.hasAttribute("data-view")) { st.view = +cur.getAttribute("data-view"); st.filter = ""; renderMain(); setFocus($('.f[data-id="v' + st.view + '"]')); return; }
     if (cur.hasAttribute("data-filter")) return openPicker();
     showItem(cur);
@@ -341,6 +354,7 @@
   }
   window.kioskBack = back;                      // called by the Android app before its double-Back exit
   window.kioskManagesReload = true;             // the app skips its own blind reload
+  window.kioskRefreshChanged = function () { applyRefresh(); };   // the app calls this after its Settings change
 
   document.addEventListener("keydown", function (e) {
     var tg = e.target && e.target.tagName;
@@ -417,6 +431,29 @@
     x.send();
   }
 
+  // ---------- data refresh interval ----------
+  // Priority: the viewer's saved choice (?refresh= sets it), then the feed's meta.refreshMinutes, then 5.
+  // Inside the Android app the choice is stored by the app (AgentTelecastApp), so its Settings match.
+  var RF_KEY = "agenttelecast.refresh", RF_OPTS = [0, 1, 5, 15, 30, 60], APP = window.AgentTelecastApp || null, rfTimer = null;
+  function rfValid(v) { var n = v === "off" ? 0 : parseInt(v, 10); return RF_OPTS.indexOf(n) >= 0 ? n : null; }
+  function rfSaved() { try { return rfValid(APP ? APP.getRefreshMinutes() : localStorage.getItem(RF_KEY)); } catch (e) { return null; } }
+  function rfSave(v) { try { if (APP) APP.setRefreshMinutes(v); else localStorage.setItem(RF_KEY, String(v)); } catch (e) {} }
+  function rfMinutes() { var s = rfSaved(); if (s != null) return s; var f = rfValid(M.refreshMinutes); return f != null ? f : 5; }
+  function rfText(m) { return m === 0 ? "Auto-refresh off" : m === 60 ? "Looks for new data every hour" : m === 1 ? "Looks for new data every minute" : "Looks for new data every " + m + " min"; }
+  function applyRefresh() {
+    var m = rfMinutes(), b = $(".rf");
+    if (b) b.textContent = rfText(m);
+    if (rfTimer) clearInterval(rfTimer);
+    rfTimer = m ? setInterval(checkUpdate, m * 60 * 1000) : null;
+  }
+  function renderNote() {
+    var b = $(".rf"), n = $(".rnote");
+    if (!M.updateNote) { if (n) n.parentNode.removeChild(n); return; }
+    if (!n && b) { n = document.createElement("span"); n.className = "rnote"; b.parentNode.insertBefore(n, b.nextSibling); }
+    if (n) n.textContent = M.updateNote;
+  }
+  try { var qr = new URLSearchParams(location.search).get("refresh"); if (qr != null && rfValid(qr) != null) rfSave(rfValid(qr)); } catch (e) {}
+
   // ---------- boot ----------
   renderNav(); renderMain();
   var start = null;
@@ -428,5 +465,5 @@
   setFocus(start || navEl());
   if (WEB) { root.classList.add("mouse"); var sb = $(".scroll"); if (sb && start && start.getAttribute("data-zone") === "main") nativeNearest(sb, start, 70); }
   tick(); setInterval(tick, 10000);
-  setInterval(checkUpdate, 5 * 60 * 1000);
+  renderNote(); applyRefresh();
 })();

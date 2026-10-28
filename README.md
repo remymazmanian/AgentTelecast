@@ -84,10 +84,16 @@ APP_ID=com.example.myagenttelecast ./build.sh     # your own app id
 | Arrows | Move between sections and cards |
 | OK | Open the highlighted card or section |
 | Back | Close the open panel or step back; press twice quickly to exit the app |
-| Hold OK, or MENU | Settings (page address, auto-reload, text zoom) |
+| Hold OK, or MENU | Settings (page address, how often to look for new data, text zoom) |
 
 In a browser the same keys work on the keyboard (Enter for OK, Esc or Backspace for Back), and you can
 click or tap too.
+
+**How often it looks for new data is up to you.** Move down past the last section to the footer line
+("Looks for new data every 5 min") and press OK, or click it, to pick Off, 1, 5, 15 or 30 minutes, or
+every hour. The footer shows your choice. You can also set it with `?refresh=15` in the address or in the
+app's Settings. A feed can suggest a default with `meta.refreshMinutes`. See
+[docs/DATA-FORMAT.md](docs/DATA-FORMAT.md#how-often-the-page-looks-for-new-data).
 
 ## The data feed
 

@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -88,6 +89,7 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         if (Build.VERSION.SDK_INT >= 21) s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        web.addJavascriptInterface(new AppBridge(), "AgentTelecastApp");
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new KioskClient());
         web.setFocusable(true);
@@ -165,6 +167,21 @@ public class MainActivity extends Activity {
         if (target.isEmpty()) { if (currentUrl != null) openSetup(); }
         else if (currentUrl != null && !target.equals(currentUrl)) load();
         schedulePeriodic();
+        // Settings may have changed the refresh interval; let the page pick it up.
+        web.evaluateJavascript("window.kioskRefreshChanged&&window.kioskRefreshChanged()", null);
+    }
+
+    /**
+     * Lets the page read and save the data refresh choice, so the page's picker and the app's
+     * Settings stay in sync. Exposes one bounded number only; no other app data.
+     */
+    private final class AppBridge {
+        @JavascriptInterface public int getRefreshMinutes() { return Prefs.savedRefresh(getApplicationContext()); }
+        @JavascriptInterface public void setRefreshMinutes(int m) {
+            if (m < 0 || m > 60) return;
+            Prefs.saveRefresh(getApplicationContext(), m);
+            handler.post(new Runnable() { @Override public void run() { schedulePeriodic(); } });
+        }
     }
 
     @Override

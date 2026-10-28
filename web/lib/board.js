@@ -51,6 +51,10 @@
     var n = 4294967296 * (2097151 & h2) + (h1 >>> 0);
     return ("000000000000" + n.toString(16)).slice(-12);
   }
+  // Data refresh interval in minutes. 0 = off. Anything else in a feed is ignored.
+  var REFRESH = [0, 1, 5, 15, 30, 60], REFRESH_DEFAULT = 5;
+  function refreshMin(v) { var n = v === "off" ? 0 : parseInt(v, 10); return REFRESH.indexOf(n) >= 0 ? n : null; }
+  function refreshText(m) { return m === 0 ? "Auto-refresh off" : m === 60 ? "Looks for new data every hour" : m === 1 ? "Looks for new data every minute" : "Looks for new data every " + m + " min"; }
   function tzShort(tz, d) {
     try {
       var p = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "short" }).formatToParts(d || new Date());
@@ -135,10 +139,17 @@
     kpis.forEach(function (k) { if (k.label.length > 18 && /agents active|bots active/i.test(k.label)) { var word = /bots active/i.test(k.label) ? "Bots active" : "Agents active"; k.detail = k.label.replace(/^(agents|bots) active\s*/i, "").replace(/^since/i, "Since") + (k.detail ? " · " + k.detail : ""); k.label = word; } });
 
     var version = opts.version || hash(JSON.stringify([feedIn, opts.versionSalt || ""]));
-    var M = { version: version, summary: model.summary, sources: model.sources, asOf: asOf, asOfShort: asOfShort, nav: nav, icons: ICONS, tz: tz, tzLabel: tzLabel, storageKey: opts.storageKey || "agenttelecast.v1" };
+    var note = String(meta.updateNote || meta.nextUpdate || "").trim().slice(0, 120);
+    var M = { version: version, summary: model.summary, sources: model.sources, asOf: asOf, asOfShort: asOfShort, nav: nav, icons: ICONS, tz: tz, tzLabel: tzLabel, storageKey: opts.storageKey || "agenttelecast.v1", refreshMinutes: refreshMin(meta.refreshMinutes), updateNote: note };
     var kpiHtml = kpis.map(function (k, i) { return '<div class="kpi t-' + k.tone + (k.target > 0 ? " f" : "") + '" data-zone="kpi" data-id="k' + i + '" data-target="' + (k.target > 0 ? k.target : "") + '"><div class="kl">' + ic(k.icon) + esc(k.label) + '</div><div class="kv">' + esc(k.value) + '</div><div class="kd">' + esc(k.detail) + "</div></div>"; }).join("");
     var subtitle = opts.subtitle != null ? opts.subtitle : model.subtitle != null ? String(model.subtitle) : "";
     return { M: M, kpis: kpis, kpiHtml: kpiHtml, asOf: asOf, version: version, subtitle: subtitle, sections: nav.length };
+  }
+
+  // Footer refresh line. The page script swaps in the viewer's saved choice when it starts.
+  function footRefresh(M) {
+    var m = M.refreshMinutes != null ? M.refreshMinutes : REFRESH_DEFAULT;
+    return '<button type="button" class="rf f" data-zone="rf" data-id="rf">' + esc(refreshText(m)) + "</button>" + (M.updateNote ? '<span class="rnote">' + esc(M.updateNote) + "</span>" : "");
   }
 
   // Full HTML page. assets: { css (font already inlined), tvjs, boardjs (this file, for the feed loader),
@@ -178,11 +189,11 @@
       head + '<style>' + assets.css + "</style></head>\n<body>\n" +
       '<aside class="rail">\n  <div class="brand"><div class="mark"><svg class="gbot" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 11V7" stroke="#8fb4ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="24" cy="5.6" r="2.6" fill="#4f8dff"/><rect x="4.6" y="21" width="3.6" height="9" rx="1.8" fill="#8fb4ff"/><rect x="39.8" y="21" width="3.6" height="9" rx="1.8" fill="#8fb4ff"/><rect x="8" y="11" width="32" height="29" rx="9" fill="#4f8dff"/><rect x="12" y="17" width="24" height="13.5" rx="5" fill="#0b1020"/><g class="look"><g class="blink"><circle cx="19" cy="23.75" r="2.7" fill="#7cf0d6"/><circle cx="29" cy="23.75" r="2.7" fill="#7cf0d6"/></g></g><rect x="19" y="33.6" width="10" height="2.4" rx="1.2" fill="#0b1020" opacity=".55"/></svg></div><div><h1>AgentTelecast</h1><p>' + esc(r.subtitle) + "</p></div></div>\n" +
       '  <nav class="nav"><div class="nav-in"></div></nav>\n' +
-      '  <div class="foot"><div class="clock"></div><div class="date"></div><div class="asof"><span class="live"></span>Data as of <b>' + esc(r.asOf) + "</b><br>Checks for updates every 5 min</div></div>\n</aside>\n" +
+      '  <div class="foot"><div class="clock"></div><div class="date"></div><div class="asof"><span class="live"></span>Data as of <b>' + esc(r.asOf) + "</b><br>" + footRefresh(r.M) + "</div></div>\n</aside>\n" +
       '<main class="main"><div class="kpis">' + r.kpiHtml + '</div><div class="content" style="display:flex;flex-direction:column;flex:1;min-height:0"></div></main>\n' +
       '<div class="scrim"></div><aside class="drawer"></aside>\n' +
       "<script>window.__MODEL__=" + data + ";window.__BB_START__=function(){" + js(assets.tvjs) + "};<\/script>" + loader + "\n</body></html>";
   }
 
-  return { ICONS: ICONS, RULES: RULES, normalize: normalize, build: build, page: page, hash: hash, esc: esc };
+  return { ICONS: ICONS, RULES: RULES, REFRESH: REFRESH, normalize: normalize, build: build, page: page, hash: hash, esc: esc, refreshText: refreshText };
 });

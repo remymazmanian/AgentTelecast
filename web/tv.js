@@ -89,6 +89,7 @@
       return '<div class="ni f t-' + s.tone + (i === st.sec ? " sel" : "") + '" data-zone="nav" data-id="nav' + i + '" data-sec="' + i + '">' + icon(s.icon) + '<span class="lbl">' + esc(s.label) + '</span><span class="cnt">' + n + "</span></div>";
     }).join("");
   }
+
   function card(it, sec, idx) {
     var tone = it.status ? it.status.tone : sec.tone;
     var h = '<div class="card f t-' + tone + '" data-zone="main" data-id="c' + idx + '" data-idx="' + idx + '">';
@@ -154,7 +155,7 @@
   function selectSection(i, keepView) {
     if (i === st.sec && keepView) return;
     st.sec = i; if (!keepView) { st.view = 0; st.filter = ""; }
-    $$(".ni").forEach(function (n) { n.classList.toggle("sel", +n.getAttribute("data-sec") === i); });
+    $$(".ni[data-sec]").forEach(function (n) { n.classList.toggle("sel", +n.getAttribute("data-sec") === i); });
     renderMain(); save();
   }
 
@@ -236,9 +237,9 @@
       if (dir === "up" || dir === "down") return scrollDrawer(dir === "down" ? 1 : -1);
       return stepDrawer(dir === "right" ? 1 : -1);
     }
-    if (z === "rf") { if (dir === "up") setFocus(zoneEls("nav").pop()); else if (dir === "right") setFocus(firstMain() || $(".kpi.f")); return; }
+    if (z === "set") { if (dir === "down") setFocus(zoneEls("nav")[0]); else if (dir === "right") setFocus(firstMain() || $(".kpi.f")); return; }
     var t2 = nearest(cur, dir, zoneEls(z));
-    if (z === "nav") { if (dir === "right") return setFocus(firstMain() || $(".kpi.f")); if (t2 && dir !== "left") setFocus(t2); else if (!t2 && dir === "down" && zoneEls("rf").length) setFocus(zoneEls("rf")[0]); return; }
+    if (z === "nav") { if (dir === "right") return setFocus(firstMain() || $(".kpi.f")); if (t2 && dir !== "left") setFocus(t2); else if (!t2 && dir === "up" && zoneEls("set").length) setFocus(zoneEls("set")[0]); return; }
     if (t2) return setFocus(t2);
     if (dir === "left") return setFocus(navEl());
     if (z === "main" && dir === "up") return setFocus(nearest(cur, "up", zoneEls("kpi")) || $(".kpi.f"));
@@ -324,13 +325,13 @@
     setFocus($(".opt.cur") || $(".opt"));
   }
   function openRefresh() {
-    var m = rfMinutes(), saved = rfSaved() != null;
-    var h = '<div class="dh">' + closeBtn() + '<div class="kick">' + icon("repeat") + 'Data refresh</div><div class="dtitle">Look for new data</div>' +
-      '<div class="dmeta"><span>' + (APP ? "Saved in the app. Also in its Settings (press Menu or hold OK)." : "Saved in this browser.") + (saved ? "" : " Now using the " + (rfValid(M.refreshMinutes) != null ? "feed's" : "default") + " setting.") + "</span></div>" +
-      '</div><div class="dbody"><div class="db-in">' + (M.updateNote ? '<div class="note">' + icon("info") + "<div><b>From the data owner:</b> " + esc(M.updateNote) + "</div></div>" : "") + '<div class="opts">';
-    h += RF_OPTS.map(function (o, i) { return '<div class="opt f' + (o === m ? " cur" : "") + '" data-zone="drawer" data-id="r' + i + '" data-val="' + o + '"><span>' + (o === 0 ? "Off" : o === 60 ? "Every hour" : o === 1 ? "Every minute" : "Every " + o + " minutes") + "</span>" + (o === m ? '<span class="c">Current</span>' : "") + "</div>"; }).join("");
+    var m = rfMinutes();
+    var h = '<div class="dh">' + closeBtn() + '<div class="kick">' + icon("gear") + 'Settings</div><div class="dtitle">Check for new data</div>' +
+      '<div class="dmeta"><span>' + (APP ? "How often this screen checks. Saved in the app (also under Menu)." : "How often this screen checks. Saved in this browser.") + "</span></div>" +
+      '</div><div class="dbody"><div class="db-in"><div class="opts">';
+    h += RF_OPTS.map(function (o, i) { return '<div class="opt f' + (o === m ? " cur" : "") + '" data-zone="drawer" data-id="r' + i + '" data-val="' + o + '"><span>' + (o === 0 ? "Off" : o === 60 ? "Every hour" : o === 1 ? "Every minute" : "Every " + o + " minutes") + "</span>" + (o === m ? '<span class="c ck">✓</span>' : "") + "</div>"; }).join("");
     h += "</div></div></div>" + foot('<span><span class="key">OK</span>Choose</span>');
-    st.ret = "rf"; st.picker = "rf"; dItem = null; openDrawer(h);
+    st.ret = "set"; st.picker = "rf"; dItem = null; openDrawer(h);
     setFocus($(".opt.cur") || $(".opt"));
   }
 
@@ -342,7 +343,7 @@
     if (z === "kpi") { var t = cur.getAttribute("data-target"); if (t !== "") { var ti = +t; selectSection(ti); var ne = navEl(); $$(".ni").forEach(function (n) { n.classList.toggle("sel", n === ne); }); keepNavVisible(ne); setFocus(firstMain()); } return; }
     if (z === "drawer" && st.picker === "rf") { rfSave(+cur.getAttribute("data-val")); st.picker = false; applyRefresh(); closeDrawer(); return; }
     if (z === "drawer") { st.filter = cur.getAttribute("data-val"); st.picker = false; renderMain(); closeDrawer(); return; }
-    if (z === "rf") return openRefresh();
+    if (z === "set") return openRefresh();
     if (cur.hasAttribute("data-view")) { st.view = +cur.getAttribute("data-view"); st.filter = ""; renderMain(); setFocus($('.f[data-id="v' + st.view + '"]')); return; }
     if (cur.hasAttribute("data-filter")) return openPicker();
     showItem(cur);
@@ -415,7 +416,21 @@
     try {
       $(".clock").textContent = d.toLocaleTimeString("en-US", { timeZone: o.timeZone, hour: "numeric", minute: "2-digit" });
       $(".date").textContent = d.toLocaleDateString("en-US", { timeZone: o.timeZone, weekday: "long", month: "long", day: "numeric" }) + (M.tzLabel ? " · " + M.tzLabel : "");
+      $(".asof .upd").textContent = footLine(d.getTime(), o.timeZone);
     } catch (e) {}
+  }
+  // Footer line: "Updated 7:18 PM · Next ~8:00 PM". The date line above already names the time zone.
+  function footLine(now, tz) {
+    function t(ms) { return new Date(ms).toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit" }); }
+    function day(ms) { return new Date(ms).toLocaleDateString("en-US", { timeZone: tz }); }
+    var u = M.updatedAt, n = M.nextUpdate, s;
+    if (u == null) s = "Update time unknown";
+    else if (day(u) === day(now)) s = "Updated " + t(u);
+    else if (day(u) === day(now - 864e5)) s = "Updated yesterday " + t(u);
+    else s = "Updated " + new Date(u).toLocaleDateString("en-US", { timeZone: tz, month: "short", day: "numeric" }) + ", " + t(u);
+    // The next update can be a little late; after 20 minutes past due, stop promising it.
+    if (n != null && n > now - 20 * 60000 && n - now < 2 * 864e5) s += " · Next ~" + t(n) + (day(n) === day(now) ? "" : " tomorrow");
+    return s;
   }
   function doReload() { save(); location.reload(); }
   function checkUpdate() {
@@ -439,18 +454,10 @@
   function rfSaved() { try { return rfValid(APP ? APP.getRefreshMinutes() : localStorage.getItem(RF_KEY)); } catch (e) { return null; } }
   function rfSave(v) { try { if (APP) APP.setRefreshMinutes(v); else localStorage.setItem(RF_KEY, String(v)); } catch (e) {} }
   function rfMinutes() { var s = rfSaved(); if (s != null) return s; var f = rfValid(M.refreshMinutes); return f != null ? f : 5; }
-  function rfText(m) { return m === 0 ? "Auto-refresh off" : m === 60 ? "Looks for new data every hour" : m === 1 ? "Looks for new data every minute" : "Looks for new data every " + m + " min"; }
   function applyRefresh() {
-    var m = rfMinutes(), b = $(".rf");
-    if (b) b.textContent = rfText(m);
+    var m = rfMinutes();
     if (rfTimer) clearInterval(rfTimer);
     rfTimer = m ? setInterval(checkUpdate, m * 60 * 1000) : null;
-  }
-  function renderNote() {
-    var b = $(".rf"), n = $(".rnote");
-    if (!M.updateNote) { if (n) n.parentNode.removeChild(n); return; }
-    if (!n && b) { n = document.createElement("span"); n.className = "rnote"; b.parentNode.insertBefore(n, b.nextSibling); }
-    if (n) n.textContent = M.updateNote;
   }
   try { var qr = new URLSearchParams(location.search).get("refresh"); if (qr != null && rfValid(qr) != null) rfSave(rfValid(qr)); } catch (e) {}
 
@@ -459,11 +466,11 @@
   var start = null;
   if (st.restore && st.restore.zone === "nav") start = navEl();
   else if (st.restoreFp) start = findByFingerprint(st.restoreFp);
-  else if (st.restore && st.restore.id && st.restore.zone !== "drawer") start = $('.f[data-zone="' + st.restore.zone + '"][data-id="' + st.restore.id + '"]');
+  else if (st.restore && st.restore.id && st.restore.zone !== "drawer" && st.restore.zone !== "set") start = $('.f[data-zone="' + st.restore.zone + '"][data-id="' + st.restore.id + '"]');
   if (!start && st.restoreFp && st.restore && st.restore.zone === "main") start = $('.f[data-zone="main"][data-id="' + st.restore.id + '"]');
   if (!start && st.restoreFp) start = firstMain();
   setFocus(start || navEl());
   if (WEB) { root.classList.add("mouse"); var sb = $(".scroll"); if (sb && start && start.getAttribute("data-zone") === "main") nativeNearest(sb, start, 70); }
   tick(); setInterval(tick, 10000);
-  renderNote(); applyRefresh();
+  applyRefresh();
 })();

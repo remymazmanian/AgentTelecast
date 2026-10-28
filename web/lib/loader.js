@@ -39,7 +39,7 @@
     window.__MODEL__ = r.M;
     root.setAttribute("data-version", r.version);
     var k = document.querySelector(".kpis"); if (k) k.innerHTML = r.kpiHtml;
-    var b = document.querySelector(".asof b"); if (b) b.textContent = r.asOf;
+    var u = document.querySelector(".asof .upd"); if (u) u.textContent = r.footLine;
     var p = document.querySelector(".brand p"); if (p) p.textContent = r.subtitle;
   }
   function start() { window.__BB_START__(); if (WEB) addSourceLink(); }

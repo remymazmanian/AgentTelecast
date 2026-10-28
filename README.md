@@ -89,9 +89,9 @@ APP_ID=com.example.myagenttelecast ./build.sh     # your own app id
 In a browser the same keys work on the keyboard (Enter for OK, Esc or Backspace for Back), and you can
 click or tap too.
 
-**How often it looks for new data is up to you.** Open Settings at the bottom of the sidebar and pick
-Off, 1, 5, 15 or 30 minutes, or every hour. On a TV it shows up only when it fits under the sections;
-the app's Settings (Menu) always has it. You can also use `?refresh=15` in the address. A feed can
+**How often it looks for new data is up to you.** Open Settings with the gear next to the name at the
+top of the sidebar and pick Off, 1, 5, 15 or 30 minutes, or every hour. On a TV, press Up from the
+first section to reach the gear, OK to pick, Back to close. The app's Settings (Menu) has it too. You can also use `?refresh=15` in the address. A feed can
 suggest a default with `meta.refreshMinutes`.
 
 The footer shows the clock, the date and one line about the data, like "Updated 7:18 PM · Next ~8:00 PM".

@@ -143,9 +143,10 @@ If a feed can't be loaded or isn't valid, the page shows the baked data and a sh
 
 ## How often the page looks for new data
 
-The viewer decides. Open **Settings** at the bottom of the sidebar and pick Off, every minute, 5, 15 or
-30 minutes, or every hour. The current choice has a ✓. On a TV, Settings only appears if it fits
-below the sections without scrolling. The Android app has the same setting under Menu either way.
+The viewer decides. Open **Settings** with the gear next to the name at the top of the
+sidebar and pick Off, every minute, 5, 15 or 30 minutes, or every hour. The current choice has a ✓.
+On a TV, press Up from the first section to reach the gear. The Android app also has the same setting
+under Menu.
 
 The interval comes from, in order:
 

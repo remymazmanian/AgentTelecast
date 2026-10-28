@@ -18,6 +18,11 @@ svg.i{width:28px;height:28px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .mark svg.i{width:28px;height:28px;stroke-width:2.2}
 .brand h1{font-size:27px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
 .brand p{font-size:17px;color:var(--mut);margin-top:3px;letter-spacing:.02em}
+.brand>div:nth-child(2){flex:1;min-width:0}
+.gear{flex:none;width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:12px;background:none;color:var(--mut);padding:0;cursor:pointer}
+.gear svg.i{width:26px;height:26px}
+.gear.focus{color:#fff;background:var(--acc);outline:3px solid #fff;outline-offset:3px}
+.opt .ck{color:var(--txt);font-size:1.15em;font-weight:700} .opt.focus .ck{color:#fff}
 .nav{flex:1;overflow:hidden;position:relative}
 .nav-in{display:flex;flex-direction:column;gap:4px;transition:transform .2s ease}
 .ni{display:flex;align-items:center;gap:16px;height:58px;padding:0 16px;border-radius:14px;color:var(--txt2);font-size:22px;font-weight:500;
@@ -161,6 +166,8 @@ html.web .rail{height:100vh;height:100dvh;padding:26px 14px 20px 18px}
 html.web .brand{gap:12px;padding:0 8px 20px}
 html.web .mark{width:40px;height:40px;border-radius:12px} html.web .gbot{width:36px;height:36px}
 html.web .brand h1{font-size:20px} html.web .brand p{font-size:13px}
+html.web .gear{width:36px;height:36px;border-radius:10px} html.web .gear svg.i{width:20px;height:20px} html.web .gear:hover{color:var(--txt);background:rgba(255,255,255,.06)}
+html.mouse .gear.focus{color:var(--mut);background:none;box-shadow:none} html.web .gear:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 html.web .nav{overflow-y:auto;scrollbar-width:none} html.web .nav::-webkit-scrollbar{display:none}
 html.web .nav-in,html.web .sc-in,html.web .db-in{transform:none!important}
 html.web .ni{height:42px;font-size:15px;gap:12px;padding:0 12px;border-radius:11px;cursor:pointer}

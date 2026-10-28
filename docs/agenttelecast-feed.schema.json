@@ -83,7 +83,7 @@
       "properties": {
         "updatedAt": {
           "type": "string",
-          "description": "When the data was produced, as an ISO 8601 date-time (e.g. 2026-03-02T18:05:00Z). Shown as Data as of."
+          "description": "When the data was produced, as an ISO 8601 date-time (e.g. 2026-03-02T18:05:00Z). Shown in the footer as Updated 7:18 PM."
         },
         "sourceSha256": {
           "type": "string"
@@ -100,15 +100,10 @@
           ],
           "description": "Suggested minutes between looks for new data (0 = off). Used until the viewer picks their own interval. Default 5."
         },
-        "updateNote": {
-          "type": "string",
-          "maxLength": 120,
-          "description": "Optional footer line saying how often the feed itself changes, e.g. Updated hourly, 9 AM-6 PM."
-        },
         "nextUpdate": {
           "type": "string",
-          "maxLength": 120,
-          "description": "Another name for updateNote."
+          "format": "date-time",
+          "description": "When new data is expected next, as an ISO 8601 date-time. The footer shows it as Next ~8:00 PM."
         }
       }
     }

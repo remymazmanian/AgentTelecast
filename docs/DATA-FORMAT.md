@@ -38,13 +38,13 @@ Unknown fields are ignored, so you can keep your own bookkeeping in the same fil
 | `metrics` | array of [Metric](#metric) | Headline numbers, used for some KPI tiles. |
 | `sources` | array of strings | Where the data came from. Shown when you open the Summary card. |
 | `subtitle` | string | Small line under "AgentTelecast" in the sidebar. |
-| `timeZone` | string | IANA zone for the clock and "Data as of", e.g. `Europe/Berlin`. Default: the viewer's zone. |
+| `timeZone` | string | IANA zone for the clock and the "Updated" time, e.g. `Europe/Berlin`. Default: the viewer's zone. |
 | `timeZoneLabel` | string | Short label after times, e.g. `CET`. Default: worked out from `timeZone`. `""` hides it. |
 | `scheduledDetail` | string | Caption on the "Scheduled jobs" tile. Default `Agent routines`. |
 | `title` | string | Informational. |
-| `meta.updatedAt` | string (ISO 8601 date-time) | When the data was produced. Shown as "Data as of". |
+| `meta.updatedAt` | string (ISO 8601 date-time) | When the data was produced. The footer shows it as "Updated 7:18 PM" (or "yesterday", or a date). |
 | `meta.refreshMinutes` | number: `0`, `1`, `5`, `15`, `30` or `60` | Suggested interval for looking for new data. `0` = off. Used only until the viewer picks their own. Other values are ignored. Default `5`. |
-| `meta.updateNote` | string | Optional line under the refresh line in the footer, e.g. `Updated hourly, 9 AM–6 PM`. Use it to say how often the feed itself changes. Up to 120 characters. `meta.nextUpdate` is accepted as another name. |
+| `meta.nextUpdate` | string (ISO 8601 date-time) | Optional. When you expect to publish new data next. The footer adds "· Next ~8:00 PM" after the updated time, with "tomorrow" if it's another day. It's dropped once it's more than 20 minutes overdue. |
 
 ## Metric
 
@@ -143,9 +143,9 @@ If a feed can't be loaded or isn't valid, the page shows the baked data and a sh
 
 ## How often the page looks for new data
 
-The viewer decides. The footer line ("Looks for new data every 5 min") is a button: select it with the
-remote or click it, and pick Off, every minute, 5, 15 or 30 minutes, or every hour. The footer always
-shows the current choice, and "Auto-refresh off" when it's off.
+The viewer decides. Open **Settings** at the bottom of the sidebar and pick Off, every minute, 5, 15 or
+30 minutes, or every hour. The current choice has a ✓. On a TV, Settings only appears if it fits
+below the sections without scrolling. The Android app has the same setting under Menu either way.
 
 The interval comes from, in order:
 
@@ -156,7 +156,7 @@ The interval comes from, in order:
 3. 5 minutes.
 
 The page only reloads when the data has actually changed, and waits while a details panel is open.
-If your feed changes less often than the page checks, say so with `meta.updateNote`.
+To tell viewers when fresh data is due, set `meta.nextUpdate`.
 
 ## Checking a feed
 
